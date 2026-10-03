@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mwaniki Furnitures | Premium Home & Office Solutions</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- EmailJS Library -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script type="text/javascript">
+    (function(){
+       emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); // Replace with your free EmailJS key if using email checkout
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header>
+    <a href="index.html" class="logo">Mwaniki Furnitures</a>
+    <nav>
+      <ul>
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="contact.html">Custom Orders</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <button class="cart-btn" onclick="toggleCart()">
+        🛒 Cart (<span id="cart-count">0</span>)
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Handcrafted Elegance for Every Room</h1>
+    <p>Discover superior wood craftsmanship and modern designs tailored for Kenyan homes and executive workspaces.</p>
+    <a href="#catalog" class="btn-primary">Browse Catalog</a>
+  </section>
+
+  <!-- Catalog Section -->
+  <main class="container" id="catalog">
+    <div class="controls-bar">
+      <!-- Category Filter Tabs -->
+      <div class="filter-container">
+        <button class="filter-btn active" onclick="filterCategory('all', this)">All Items</button>
+        <button class="filter-btn" onclick="filterCategory('living', this)">Living Room</button>
+        <button class="filter-btn" onclick="filterCategory('bedroom', this)">Bedroom</button>
+        <button class="filter-btn" onclick="filterCategory('office', this)">Office</button>
+        <button class="filter-btn" onclick="filterCategory('dining', this)">Dining</button>
+      </div>
+
+      <!-- Live Search Bar -->
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search furniture..." oninput="handleSearch()">
+      </div>
+    </div>
+
+    <!-- Product Grid Rendered Dynamically via JavaScript -->
+    <div class="product-grid" id="product-grid"></div>
+  </main>
+
+  <!-- Slide-out Cart Drawer -->
+  <div id="cartModal" class="cart-modal">
+    <div class="cart-header">
+      <h3>Your Cart</h3>
+      <button class="close-cart" onclick="toggleCart()">&times;</button>
+    </div>
+    <div id="cart-items" class="cart-items">
+      <p style="color: var(--text-muted); text-align: center; margin-top: 2rem;">Your cart is currently empty.</p>
+    </div>
+    <div class="cart-footer">
+      <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 1.1rem; margin-bottom: 1rem;">
+        <span>Total:</span>
+        <span id="cart-total">KES 0</span>
+      </div>
+      <div class="checkout-options">
+        <button class="btn-whatsapp" onclick="checkoutWhatsApp()">
+          💬 Order via WhatsApp
+        </button>
+        <button class="btn-email-checkout" onclick="openEmailModal()">
+          ✉️ Order via Email
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Email Input Modal -->
+  <div id="emailModal" class="email-modal-overlay">
+    <div class="email-modal">
+      <h3 style="margin-bottom: 1rem; color: var(--primary);">Complete Email Order</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">Enter your contact info to receive an automated email invoice copy.</p>
+      
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="customer-name" placeholder="John Doe">
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="customer-email" placeholder="johndoe@example.com">
+      </div>
+      <div class="form-group">
+        <label>Delivery Location / Phone</label>
+        <input type="text" id="customer-phone" placeholder="Nairobi / 0712345678">
+      </div>
+
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+        <button onclick="closeEmailModal()" style="flex: 1; padding: 0.75rem; border: 1px solid var(--border); background: #fff; border-radius: 6px; cursor: pointer; font-weight: 600;">Cancel</button>
+        <button onclick="submitEmailOrder()" class="btn-primary" style="flex: 1; border: none; cursor: pointer;">Send Order</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 Mwaniki Furnitures. Built by Brian Mwaniki. All rights reserved.</p>
+  </footer>
+
+  <!-- JavaScript Inventory & Catalog Engine -->
+  <script>
+    // INVENTORY ARRAY: Add, remove, or update items here instantly without touching HTML!
+    const products = [
+      {
+        id: 1,
+        name: "Modern L-Shaped Sofa",
+        category: "living",
+        price: 45000,
+        image: "images/sofa.jpg",
+        fallback: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500&auto=format&fit=crop&q=60",
+        badge: "Best Seller",
+        desc: "Plush high-density cushioning upholstered in premium stain-resistant fabric."
+      },
+      {
+        id: 2,
+        name: "6-Seater Wooden Dining Table",
+        category: "dining",
+        price: 38000,
+        image: "images/dining.jpg",
+        fallback: "https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf?w=500&auto=format&fit=crop&q=60",
+        badge: "",
+        desc: "Solid mahogany finish with sleek matching cushioned chairs."
+      },
+      {
+        id: 3,
+        name: "Queen Size Executive Bed",
+        category: "bedroom",
+        price: 32000,
+        image: "images/bed.jpg",
+        fallback: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=500&auto=format&fit=crop&q=60",
+        badge: "New",
+        desc: "Sturdy solid wood frame with an elegant upholstered headboard."
+      },
+      {
+        id: 4,
+        name: "Ergonomic Office Desk",
+        category: "office",
+        price: 18500,
+        image: "images/desk.jpg",
+        fallback: "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=500&auto=format&fit=crop&q=60",
+        badge: "",
+        desc: "Spacious workstation with built-in cable management and steel frame."
+      }
+    ];
+
+    let cart = [];
+    let currentCategory = 'all';
+    let searchQuery = '';
+
+    window.onload = function() {
+      renderProducts(products);
+    };
+
+    function renderProducts(itemsToRender) {
+      const grid = document.getElementById('product-grid');
+      grid.innerHTML = '';
+
+      if (itemsToRender.length === 0) {
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 3rem;">No furniture items match your search.</p>';
+        return;
+      }
+
+      itemsToRender.forEach(item => {
+        grid.innerHTML += `
+          <div class="product-card">
+            <div class="product-img-wrapper">
+              ${item.badge ? `<span class="badge">${item.badge}</span>` : ''}
+              <img src="${item.image}" alt="${item.name}" class="product-img" onerror="this.src='${item.fallback}'">
+            </div>
+            <div class="product-info">
+              <div class="product-title">${item.name}</div>
+              <div class="product-desc">${item.desc}</div>
+              <div class="product-footer">
+                <span class="product-price">KES ${item.price.toLocaleString()}</span>
+                <button class="add-to-cart-btn" onclick="addToCart('${item.name}', ${item.price})">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function filterCategory(category, btn) {
+      currentCategory = category;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilters();
+    }
+
+    function handleSearch() {
+      searchQuery = document.getElementById('searchInput').value.toLowerCase();
+      applyFilters();
+    }
+
+    function applyFilters() {
+      let filtered = products.filter(item => {
+        let matchesCategory = (currentCategory === 'all' || item.category === currentCategory);
+        let matchesSearch = item.name.toLowerCase().includes(searchQuery) || item.desc.toLowerCase().includes(searchQuery);
+        return matchesCategory && matchesSearch;
+      });
+      renderProducts(filtered);
+    }
+
+    function toggleCart() {
+      document.getElementById('cartModal').classList.toggle('open');
+    }
+
+    function addToCart(name, price) {
+      let existingItem = cart.find(item => item.name === name);
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({ name: name, price: price, quantity: 1 });
+      }
+      updateCartUI();
+      toggleCart();
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      const cartCount = document.getElementById('cart-count');
+      const cartItemsContainer = document.getElementById('cart-items');
+      const cartTotal = document.getElementById('cart-total');
+
+      let totalCount = 0;
+      let totalPrice = 0;
+      cartItemsContainer.innerHTML = '';
+
+      if (cart.length === 0) {
+        cartItemsContainer.innerHTML = '<p style="color: var(--text-muted); text-align: center; margin-top: 2rem;">Your cart is currently empty.</p>';
+      } else {
+        cart.forEach((item, index) => {
+          totalCount += item.quantity;
+          totalPrice += item.price * item.quantity;
+
+          cartItemsContainer.innerHTML += `
+            <div class="cart-item">
+              <div>
+                <strong>${item.name}</strong><br>
+                KES ${item.price.toLocaleString()} x ${item.quantity}
+              </div>
+              <button onclick="removeFromCart(${index})" style="background:none; border:none; color: #ef4444; cursor:pointer; font-weight:bold;">Remove</button>
+            </div>
+          `;
+        });
+      }
+
+      cartCount.innerText = totalCount;
+      cartTotal.innerText = `KES ${totalPrice.toLocaleString()}`;
+    }
+
+    // WhatsApp Checkout using your phone number 254796058837
+    function checkoutWhatsApp() {
+      if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+      }
+
+      let message = "Hello Mwaniki Furnitures, I would like to place an order:%0A%0A";
+      let total = 0;
+
+      cart.forEach(item => {
+        let subtotal = item.price * item.quantity;
+        total += subtotal;
+        message += `- ${item.name} (x${item.quantity}): KES ${subtotal.toLocaleString()}%0A`;
+      });
+
+      message += `%0A*Total Amount: KES ${total.toLocaleString()}*%0A%0APlease confirm availability and delivery details.`;
+
+      let phoneNumber = "254796058837"; 
+      window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+    }
+
+    function openEmailModal() {
+      if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+      }
+      toggleCart();
+      document.getElementById('emailModal').classList.add('open');
+    }
+
+    function closeEmailModal() {
+      document.getElementById('emailModal').classList.remove('open');
+    }
+
+    function submitEmailOrder() {
+      const name = document.getElementById('customer-name').value.trim();
+      const email = document.getElementById('customer-email').value.trim();
+      const phone = document.getElementById('customer-phone').value.trim();
+
+      if (!name || !email || !phone) {
+        alert("Please fill in all contact details.");
+        return;
+      }
+
+      let orderSummary = "";
+      let total = 0;
+      cart.forEach(item => {
+        let subtotal = item.price * item.quantity;
+        total += subtotal;
+        orderSummary += `${item.name} (x${item.quantity}) - KES ${subtotal.toLocaleString()}\n`;
+      });
+
+      const templateParams = {
+        customer_name: name,
+        customer_email: email,
+        customer_phone: phone,
+        order_details: orderSummary,
+        total_amount: `KES ${total.toLocaleString()}`
+      };
+
+      emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+        .then(function(response) {
+           alert("Order sent successfully! Check your email for confirmation.");
+           closeEmailModal();
+           cart = [];
+           updateCartUI();
+        }, function(error) {
+           alert("Failed to send order via email. Please try WhatsApp checkout.");
+           console.error('FAILED...', error);
+        });
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Orders & Contact | Mwaniki Furnitures</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header>
+    <a href="index.html" class="logo">Mwaniki Furnitures</a>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="contact.html" class="active">Custom Orders</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Page Header -->
+  <section class="hero" style="padding: 4rem 1rem;">
+    <h1>Request a Custom Design</h1>
+    <p>Have a unique vision, specific measurements, or custom wood finish in mind? Let us build it for you.</p>
+  </section>
+
+  <!-- Contact Form Section -->
+  <main class="container" style="max-width: 600px;">
+    <div style="background: #fff; padding: 2.5rem; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+      <h2 style="color: var(--primary); margin-bottom: 1.5rem; font-size: 1.8rem;">Custom Order Inquiry</h2>
+      
+      <div class="form-group">
+        <label>Your Name</label>
+        <input type="text" id="cust-name" placeholder="Enter your full name">
+      </div>
+
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="text" id="cust-phone" placeholder="e.g. 0712345678">
+      </div>
+
+      <div class="form-group">
+        <label>Describe Your Custom Project / Dimensions</label>
+        <textarea id="cust-details" rows="5" placeholder="E.g., I need a 6-seater executive office desk made of mahogany with cable management slots..."></textarea>
+      </div>
+
+      <button class="btn-whatsapp" onclick="sendCustomInquiry()" style="width: 100%; padding: 1rem; margin-top: 1rem; font-size: 1rem; border-radius: 6px;">
+        💬 Send Custom Request via WhatsApp
+      </button>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 Mwaniki Furnitures. Built by Brian Mwaniki. All rights reserved.</p>
+  </footer>
+
+  <!-- Script for Custom WhatsApp Inquiry -->
+  <script>
+    function sendCustomInquiry() {
+      const name = document.getElementById('cust-name').value.trim();
+      const phone = document.getElementById('cust-phone').value.trim();
+      const details = document.getElementById('cust-details').value.trim();
+
+      if (!name || !phone || !details) {
+        alert("Please fill in all fields before sending your request.");
+        return;
+      }
+
+      let message = `Hello Mwaniki Furnitures, I would like to request a custom build:%0A%0A`;
+      message += `*Name:* ${name}%0A`;
+      message += `*Phone:* ${phone}%0A`;
+      message += `*Details:* ${details}%0A`;
+
+      let phoneNumber = "254796058837";
+      window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+    }
+  </script>
+
+</body>
+</html>
